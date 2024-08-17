@@ -1,6 +1,6 @@
 'use client';
 import React, { useEffect, useState } from 'react';
-import { db, auth } from '../lib/firebase';
+import { db, auth } from '../firebase';
 import { collection, query, where, onSnapshot } from 'firebase/firestore';
 import { Container, Typography, Button, Grid } from '@mui/material';
 import AddItemForm from '../components/AddItemForm';
