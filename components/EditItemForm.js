@@ -1,6 +1,6 @@
 // components/EditItemForm.js
 import React, { useState, useEffect } from 'react';
-import { db } from '../lib/firebase';
+import { db } from '../firebase';
 import { doc, updateDoc, getDoc } from 'firebase/firestore';
 import { TextField, Button, Dialog, DialogActions, DialogContent, DialogTitle } from '@mui/material';
 
