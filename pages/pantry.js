@@ -7,15 +7,15 @@ import AddItemForm from '../components/AddItemForm';
 import ItemCard from '../components/ItemCard';
 import EditItemForm from '../components/EditItemForm';
 import { Container, Typography, Grid, Button, IconButton } from '@mui/material';
-//import { DarkMode, LightMode } from '@mui/icons-material';
-//import { useTheme } from '../context/ThemeContext';
+import { DarkMode, LightMode } from '@mui/icons-material';
+import { useTheme } from '../context/ThemeContext'; // Ensure correct import
 
 const Pantry = () => {
   const [items, setItems] = useState([]);
   const [selectedItemId, setSelectedItemId] = useState(null);
   const [isEditOpen, setIsEditOpen] = useState(false);
   const router = useRouter();
-  //const { isDarkMode, toggleDarkMode } = useTheme(); // Destructuring from useTheme
+  const { isDarkMode, toggleDarkMode } = useTheme(); // Ensure useTheme is working
 
   useEffect(() => {
     const unsubscribe = auth.onAuthStateChanged((user) => {
@@ -58,6 +58,9 @@ const Pantry = () => {
       <Button onClick={handleSignOut} variant="contained" color="secondary" style={{ marginBottom: '20px' }}>
         Sign Out
       </Button>
+      <IconButton onClick={toggleDarkMode} style={{ marginBottom: '20px' }}>
+        {isDarkMode ? <LightMode /> : <DarkMode />}
+      </IconButton>
       <AddItemForm userId={auth.currentUser?.uid} />
       <Grid container spacing={2} sx={{ marginTop: 2 }}>
         {items.map(item => (

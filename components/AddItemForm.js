@@ -4,7 +4,6 @@ import { collection, addDoc } from 'firebase/firestore';
 import { TextField, Button } from '@mui/material';
 
 const AddItemForm = ({ userId }) => {
-  console.log("Received userId:", userId); // Debugging userId value
 
   const [itemName, setItemName] = useState('');
   const [quantity, setQuantity] = useState(1);
