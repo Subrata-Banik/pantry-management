@@ -1,7 +1,6 @@
-// components/EditItemForm.js
 import React, { useState, useEffect } from 'react';
+import { doc, getDoc, updateDoc } from 'firebase/firestore';
 import { db } from '../firebase';
-import { doc, updateDoc, getDoc } from 'firebase/firestore';
 import { TextField, Button, Dialog, DialogActions, DialogContent, DialogTitle } from '@mui/material';
 
 const EditItemForm = ({ itemId, open, onClose }) => {
@@ -11,23 +10,24 @@ const EditItemForm = ({ itemId, open, onClose }) => {
 
   useEffect(() => {
     const fetchItem = async () => {
-      const docRef = doc(db, 'pantryItems', itemId);
-      const docSnap = await getDoc(docRef);
-      if (docSnap.exists()) {
-        const itemData = docSnap.data();
-        setItemName(itemData.itemName);
-        setQuantity(itemData.quantity);
-        setExpirationDate(itemData.expirationDate);
+      const itemRef = doc(db, 'pantryitems', itemId);
+      const itemDoc = await getDoc(itemRef);
+      if (itemDoc.exists()) {
+        const data = itemDoc.data();
+        setItemName(data.itemName);
+        setQuantity(data.quantity);
+        setExpirationDate(data.expirationDate);
       }
     };
+
     if (itemId) {
       fetchItem();
     }
   }, [itemId]);
 
-  const handleSave = async () => {
-    const docRef = doc(db, 'pantryItems', itemId);
-    await updateDoc(docRef, {
+  const handleUpdate = async () => {
+    const itemRef = doc(db, 'pantryitems', itemId);
+    await updateDoc(itemRef, {
       itemName,
       quantity,
       expirationDate,
@@ -36,7 +36,7 @@ const EditItemForm = ({ itemId, open, onClose }) => {
   };
 
   return (
-    <Dialog open={open} onClose={onClose} fullWidth>
+    <Dialog open={open} onClose={onClose}>
       <DialogTitle>Edit Item</DialogTitle>
       <DialogContent>
         <TextField
@@ -70,10 +70,10 @@ const EditItemForm = ({ itemId, open, onClose }) => {
         />
       </DialogContent>
       <DialogActions>
-        <Button onClick={onClose} color="secondary">
+        <Button onClick={onClose} color="primary">
           Cancel
         </Button>
-        <Button onClick={handleSave} variant="contained" color="primary">
+        <Button onClick={handleUpdate} color="primary">
           Save
         </Button>
       </DialogActions>

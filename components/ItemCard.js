@@ -1,32 +1,48 @@
 // components/ItemCard.js
 import React from 'react';
-import { db } from '../firebase';
-import { doc, deleteDoc } from 'firebase/firestore';
-import { Card, CardContent, Typography, IconButton } from '@mui/material';
-import DeleteIcon from '@mui/icons-material/Delete';
+import { Card, CardContent, Typography, IconButton, CardActions, Box, Chip, Avatar } from '@mui/material';
+import { Delete, Edit } from '@mui/icons-material';
 
-const ItemCard = ({ id, itemName, quantity, expirationDate, onEdit }) => {
-  const handleDelete = async () => {
-    try {
-      await deleteDoc(doc(db, 'pantryitems', id));
-      console.log(`Document with ID ${id} successfully deleted`);
-    } catch (error) {
-      console.error("Error deleting document: ", error);
-    }
-  };
+const ItemCard = ({ id, itemName, quantity, expirationDate, onEdit, onDelete }) => {
+  const formattedDate = new Date(expirationDate).toLocaleDateString();
 
   return (
-    <Card>
+    <Card sx={{
+      backgroundColor: 'background.paper',
+      boxShadow: 6,  // Increased shadow for a more materialistic feel
+      borderRadius: 4,  // More rounded corners
+      transition: 'transform 0.3s ease-in-out, box-shadow 0.3s ease-in-out',
+      '&:hover': {
+        transform: 'translateY(-8px)',
+        boxShadow: 12,  // Enhance shadow on hover
+      },
+      padding: 2,
+      position: 'relative',  // Allows positioning of elements
+    }}>
       <CardContent>
-        <Typography variant="h6">{itemName}</Typography>
-        <Typography variant="body2">Quantity: {quantity}</Typography>
-        <Typography variant="body2">Expiration Date: {expirationDate}</Typography>
-        <IconButton onClick={onEdit}>
-        </IconButton>
-        <IconButton onClick={handleDelete}>
-          <DeleteIcon />
-        </IconButton>
+        <Box sx={{ display: 'flex', alignItems: 'center', mb: 2 }}>
+          <Avatar sx={{ bgcolor: 'primary.main', mr: 2 }}>
+            {itemName.charAt(0).toUpperCase()}
+          </Avatar>
+          <Typography variant="h6" component="div" sx={{ fontWeight: 'bold', flexGrow: 1 }}>
+            {itemName}
+          </Typography>
+        </Box>
+        <Typography variant="body2" color="textSecondary">
+          Quantity: <Chip label={quantity} color="primary" size="small" />
+        </Typography>
+        <Typography variant="body2" color="textSecondary" sx={{ mt: 1 }}>
+          Expiration Date: <Chip label={formattedDate} color="secondary" size="small" />
+        </Typography>
       </CardContent>
+      <CardActions sx={{ justifyContent: 'flex-end' }}>
+        <IconButton aria-label="edit" onClick={onEdit} color="primary">
+          <Edit />
+        </IconButton>
+        <IconButton aria-label="delete" onClick={onDelete} color="error">
+          <Delete />
+        </IconButton>
+      </CardActions>
     </Card>
   );
 };

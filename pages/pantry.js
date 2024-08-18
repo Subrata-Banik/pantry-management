@@ -2,20 +2,17 @@
 import React, { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { auth, db } from '../firebase';
-import { collection, query, where, onSnapshot } from 'firebase/firestore';
+import { collection, query, where, onSnapshot, doc, deleteDoc } from 'firebase/firestore';
 import AddItemForm from '../components/AddItemForm';
 import ItemCard from '../components/ItemCard';
 import EditItemForm from '../components/EditItemForm';
-import { Container, Typography, Grid, Button, IconButton } from '@mui/material';
-import { DarkMode, LightMode } from '@mui/icons-material';
-import { useTheme } from '../context/ThemeContext'; // Ensure correct import
+import { Container, Typography, Grid, Button } from '@mui/material';
 
 const Pantry = () => {
   const [items, setItems] = useState([]);
   const [selectedItemId, setSelectedItemId] = useState(null);
   const [isEditOpen, setIsEditOpen] = useState(false);
   const router = useRouter();
-  const { isDarkMode, toggleDarkMode } = useTheme(); // Ensure useTheme is working
 
   useEffect(() => {
     const unsubscribe = auth.onAuthStateChanged((user) => {
@@ -31,6 +28,14 @@ const Pantry = () => {
 
     return () => unsubscribe();
   }, [router]);
+
+  const handleDelete = async (itemId) => {
+    try {
+      await deleteDoc(doc(db, 'pantryitems', itemId));
+    } catch (error) {
+      console.error('Error deleting item:', error);
+    }
+  };
 
   const handleSignOut = () => {
     auth.signOut().then(() => {
@@ -58,9 +63,6 @@ const Pantry = () => {
       <Button onClick={handleSignOut} variant="contained" color="secondary" style={{ marginBottom: '20px' }}>
         Sign Out
       </Button>
-      <IconButton onClick={toggleDarkMode} style={{ marginBottom: '20px' }}>
-        {isDarkMode ? <LightMode /> : <DarkMode />}
-      </IconButton>
       <AddItemForm userId={auth.currentUser?.uid} />
       <Grid container spacing={2} sx={{ marginTop: 2 }}>
         {items.map(item => (
@@ -71,10 +73,12 @@ const Pantry = () => {
               quantity={item.quantity}
               expirationDate={item.expirationDate}
               onEdit={() => handleEditOpen(item.id)}
+              onDelete={() => handleDelete(item.id)} 
             />
           </Grid>
         ))}
       </Grid>
+
       {selectedItemId && (
         <EditItemForm 
           itemId={selectedItemId} 
