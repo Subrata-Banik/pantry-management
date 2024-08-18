@@ -1,4 +1,3 @@
-// context/ThemeContext.js
 import React, { createContext, useState, useContext } from 'react';
 
 const ThemeContext = createContext();
@@ -18,4 +17,5 @@ export const ThemeProvider = ({ children }) => {
   );
 };
 
-export const useTheme = () => useContext(ThemeContext);
+export const useTheme = () => {useContext(ThemeContext);
+};
