@@ -1,53 +1,68 @@
-'use client';
+// pages/signin.js
 import React, { useState } from 'react';
-import { auth } from '../firebase';
-import { signInWithEmailAndPassword } from 'firebase/auth';
-import { Container, TextField, Button, Typography } from '@mui/material';
 import { useRouter } from 'next/router';
+import { auth } from '../firebase';
+import { signInWithEmailAndPassword, createUserWithEmailAndPassword } from 'firebase/auth';
+import { Container, TextField, Button, Typography, Link } from '@mui/material';
 
 const SignIn = () => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
+  const [error, setError] = useState(null);
+  const [isSignUp, setIsSignUp] = useState(false); // State to toggle between sign-in and sign-up
   const router = useRouter();
 
-  const handleSignIn = async (e) => {
+  const handleAuth = async (e) => {
     e.preventDefault();
     try {
-      await signInWithEmailAndPassword(auth, email, password);
-      router.push('/');
+      if (isSignUp) {
+        await createUserWithEmailAndPassword(auth, email, password);
+      } else {
+        await signInWithEmailAndPassword(auth, email, password);
+      }
+      router.push('/'); // Redirect to the homepage or pantry page
     } catch (error) {
-      console.error("Error signing in: ", error);
+      setError(error.message);
     }
   };
 
+  const toggleAuthMode = () => {
+    setIsSignUp(!isSignUp);
+    setError(null); // Clear any previous error
+  };
+
   return (
-    <Container>
-      <Typography variant="h4" gutterBottom>
-        Sign In
+    <Container maxWidth="xs">
+      <Typography variant="h5" gutterBottom>
+        {isSignUp ? 'Sign Up' : 'Sign In'}
       </Typography>
-      <form onSubmit={handleSignIn}>
+      {error && <Typography color="error">{error}</Typography>}
+      <form onSubmit={handleAuth}>
         <TextField
           label="Email"
           type="email"
+          fullWidth
+          margin="normal"
           value={email}
           onChange={(e) => setEmail(e.target.value)}
           required
-          fullWidth
-          margin="normal"
         />
         <TextField
           label="Password"
           type="password"
+          fullWidth
+          margin="normal"
           value={password}
           onChange={(e) => setPassword(e.target.value)}
           required
-          fullWidth
-          margin="normal"
         />
         <Button type="submit" variant="contained" color="primary" fullWidth>
-          Sign In
+          {isSignUp ? 'Sign Up' : 'Sign In'}
         </Button>
       </form>
+      <Button onClick={toggleAuthMode} fullWidth>
+        {isSignUp ? 'Already have an account? Sign In' : 'Don’t have an account? Sign Up'}
+      </Button>
     </Container>
   );
 };

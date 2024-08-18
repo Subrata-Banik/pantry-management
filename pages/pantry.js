@@ -1,18 +1,21 @@
 'use client';
 import React, { useEffect, useState } from 'react';
-import { db, auth } from '../firebase';
+import { useRouter } from 'next/navigation';
+import { auth, db } from '../firebase';
 import { collection, query, where, onSnapshot } from 'firebase/firestore';
-import { Container, Typography, Button, Grid } from '@mui/material';
 import AddItemForm from '../components/AddItemForm';
 import ItemCard from '../components/ItemCard';
 import EditItemForm from '../components/EditItemForm';
-import { useRouter } from 'next/router';
+import { Container, Typography, Grid, Button, IconButton } from '@mui/material';
+import { DarkMode, LightMode } from '@mui/icons-material';
+import { useTheme } from '../context/ThemeContext';
 
 const Pantry = () => {
   const [items, setItems] = useState([]);
   const [selectedItemId, setSelectedItemId] = useState(null);
   const [isEditOpen, setIsEditOpen] = useState(false);
   const router = useRouter();
+  const { isDarkMode, toggleDarkMode } = useTheme();
 
   useEffect(() => {
     const unsubscribe = auth.onAuthStateChanged((user) => {
@@ -22,11 +25,20 @@ const Pantry = () => {
           setItems(snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() })));
         });
       } else {
-        router.push('/signin');
+        router.push('/signin'); // Redirect to sign-in page if not authenticated
       }
     });
+
     return () => unsubscribe();
-  }, []);
+  }, [router]);
+
+  const handleSignOut = () => {
+    auth.signOut().then(() => {
+      router.push('/signin');
+    }).catch((error) => {
+      console.error("Error signing out: ", error);
+    });
+  };
 
   const handleEditOpen = (itemId) => {
     setSelectedItemId(itemId);
@@ -41,8 +53,12 @@ const Pantry = () => {
   return (
     <Container>
       <Typography variant="h4" gutterBottom>
-        My Pantry
       </Typography>
+      <Button onClick={handleSignOut} variant="contained" color="secondary" style={{ marginBottom: '20px' }}>
+      </Button>
+      <IconButton onClick={toggleDarkMode} style={{ marginBottom: '20px' }}>
+        {isDarkMode ? <LightMode /> : <DarkMode />}
+      </IconButton>
       <AddItemForm userId={auth.currentUser?.uid} />
       <Grid container spacing={2} sx={{ marginTop: 2 }}>
         {items.map(item => (

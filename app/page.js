@@ -1,25 +1,25 @@
-'use client';
+'use client'
 import React, { useEffect, useState } from 'react';
 import { db, auth } from '../firebase';
 import { collection, query, where, onSnapshot } from 'firebase/firestore';
 import { Container, Typography, Button } from '@mui/material';
 import AddItemForm from '../components/AddItemForm';
 import ItemCard from '../components/ItemCard';
-import Router, { useRouter } from 'next/router';
+import  { useRouter }  from 'next/navigation';
 
 const Home = () => {
   const [items, setItems] = useState([]);
-  const router = useRouter;
+  const router = useRouter();
 
   useEffect(() => {
     const unsubscribe = auth.onAuthStateChanged((user) => {
       if (user) {
-        const q = query(collection(db, 'pantryItems'), where('userId', '==', user.uid));
+        const q = query(collection(db, 'pantryitems'), where('userId', '==', user.uid));
         onSnapshot(q, (snapshot) => {
           setItems(snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() })));
         });
       } else {
-        Router.push('/signin');
+        router.push('/signin');
       }
     });
     return () => unsubscribe();
